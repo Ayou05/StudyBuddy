@@ -1,0 +1,46 @@
+# Gradle / Android
+.gradle/
+build/
+.idea/
+local.properties
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Large assets (don't push)
+*.zip
+flutter_windows_*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensitive
+google-services.json
+*.keystore
+*.jks
+
+# Big media archives in repo root
+Kimi_Agent_猫咪插画/
+570+图标-v1.0.3/
+awesome-design-md-main/
+
+# Build outputs / large images
+app-v2/build/
+app/build/
+build/
+
+# Screenshots and test images at repo root
+blink_*.png
+screen_*.png
+v2_*.png
+home_*.png
+letter_*.png
+*.kotlin_module
+
+# logs
+*.log
+.gradle-cache/

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Book -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,30 L54,28 L74,30 L74,78 L54,75 L34,78 Z" />
+    <path
+        android:fillColor="#E8DDF4"
+        android:pathData="M54,28 L54,75" />
+    <!-- Focus dot -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M54,52 A8,8 0,1 0,54,53 Z" />
+</vector>
