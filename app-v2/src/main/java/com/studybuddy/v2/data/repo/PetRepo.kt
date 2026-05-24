@@ -13,7 +13,6 @@ import javax.inject.Singleton
 class PetRepo @Inject constructor(
     private val pb: PbClient,
     private val dao: PetDao,
-    private val unbindRepo: UnbindRepo,
     private val prefs: PreferencesStore
 ) {
     suspend fun getOrFetchByPair(pairId: String): Pet? {
@@ -50,8 +49,6 @@ class PetRepo @Inject constructor(
     private suspend fun applyDecay(pet: Pet): Pet {
         // 蛋不衰减
         if (pet.growthStage == "EGG") return pet
-        // 宠物冬眠：解绑冷静期内跳过衰减
-        if (unbindRepo.hasActive(pet.pairId)) return pet
         // 娱乐模式：跳过衰减（用户不想被压力）
         if (prefs.appMode.first() == "LEISURE") return pet
         val now = System.currentTimeMillis()

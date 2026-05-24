@@ -44,4 +44,15 @@ class UserRepo @Inject constructor(
             list.items.firstOrNull()
         } catch (_: PbException) { null }
     }
+
+    /** 立即解绑：删除关系记录 + 清除自己的 partnerId。 */
+    suspend fun unbindRelationship(): Boolean {
+        val rel = getRelationship() ?: return true
+        val me = getMe() ?: return false
+        return try {
+            pb.deleteRecord(PbConfig.RELATIONSHIPS, rel.id)
+            pb.updateRecord<UserProfile>(PbConfig.USERS, me.id, mapOf("partnerId" to null, "partnerSince" to null))
+            true
+        } catch (_: PbException) { false }
+    }
 }
