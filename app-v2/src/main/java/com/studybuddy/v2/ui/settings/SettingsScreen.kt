@@ -42,11 +42,14 @@ import com.studybuddy.v2.ui.component.BackRow
 fun SettingsScreen(
     onBack: () -> Unit = {},
     onOpenUnbind: () -> Unit = {},
+    showBackButton: Boolean = true,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val colors = MaterialTheme.appColors
-    BackHandler { onBack() }
+    if (showBackButton) {
+        BackHandler { onBack() }
+    }
 
     Column(
         modifier = Modifier
@@ -56,9 +59,11 @@ fun SettingsScreen(
             .padding(horizontal = ClaudeSpacing.pageHorizontal)
             .padding(top = ClaudeSpacing.lg, bottom = ClaudeSpacing.xxl)
     ) {
-        // 顶部返回行
-        BackRow(onBack = onBack)
-        Spacer(Modifier.height(ClaudeSpacing.md))
+        // 顶部返回行（仅在 showBackButton = true 时显示）
+        if (showBackButton) {
+            BackRow(onBack = onBack)
+            Spacer(Modifier.height(ClaudeSpacing.md))
+        }
 
         Text("SETTINGS", style = ClaudeType.CaptionUppercase, color = colors.muted)
         Spacer(Modifier.height(ClaudeSpacing.sm))

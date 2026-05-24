@@ -38,9 +38,10 @@ data class TabSpec(
 )
 
 val bottomTabs = listOf(
-    TabSpec(Screen.Home,    "今天", "home"),
-    TabSpec(Screen.Letter,  "写信", "mail"),
-    TabSpec(Screen.CoRaise, "陪伴", "pet"),
-    TabSpec(Screen.Map,     "在哪", "map")
+    TabSpec(Screen.Home,     "今天", "home"),
+    TabSpec(Screen.Letter,   "写信", "mail"),
+    TabSpec(Screen.CoRaise,  "陪伴", "pet"),
+    TabSpec(Screen.Map,      "在哪", "map"),
+    TabSpec(Screen.Settings, "我的", "settings")
 )
 

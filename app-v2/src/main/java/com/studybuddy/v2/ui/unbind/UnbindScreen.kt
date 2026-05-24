@@ -117,7 +117,7 @@ private fun NoPartnerState() {
         Text("还没有搭档。", style = ClaudeType.TitleMd, color = colors.ink)
         Spacer(Modifier.height(ClaudeSpacing.xs))
         Text(
-            "去主页绑定搭档之后，才需要解绑这一说。",
+            "在主页绑定搭档后，这里可以解除关系。",
             style = ClaudeType.BodySm, color = colors.muted
         )
     }

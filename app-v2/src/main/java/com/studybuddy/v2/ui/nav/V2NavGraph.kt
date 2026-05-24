@@ -186,7 +186,6 @@ private fun ScaffoldBody(
                             onOpenFund = { navController.navigate(Screen.Ledger.route) },
                             onOpenStats = { navController.navigate(Screen.Stats.route) },
                             onOpenHistory = { navController.navigate(Screen.Stats.route) },
-                            onOpenSettings = { navController.navigate(Screen.Settings.route) },
                             onOpenNoteWall = { navController.navigate(Screen.CoRaise.route) }
                         )
                     }
@@ -247,9 +246,11 @@ private fun ScaffoldBody(
                         )
                     }
                     composable(Screen.Settings.route) {
+                        val isBottomTab = bottomTabs.any { it.screen.route == Screen.Settings.route }
                         SettingsScreen(
                             onBack = { navController.popBackStack() },
-                            onOpenUnbind = { navController.navigate(Screen.Unbind.route) }
+                            onOpenUnbind = { navController.navigate(Screen.Unbind.route) },
+                            showBackButton = !isBottomTab
                         )
                     }
                     composable(Screen.Quote.route) {

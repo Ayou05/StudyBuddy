@@ -62,6 +62,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val colors = MaterialTheme.appColors
     val ctx = LocalContext.current
+    var pendingLandmark by remember { mutableStateOf<Pair<Double, Double>?>(null) }
 
     var hasLocationPermission by remember {
         mutableStateOf(
@@ -100,7 +101,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             partnerLat = state.partnerLat,
             partnerLng = state.partnerLng,
             myLat = state.myLat,
-            myLng = state.myLng
+            myLng = state.myLng,
+            landmarks = state.landmarks,
+            onLongPress = { lat, lng -> pendingLandmark = lat to lng }
         )
 
         // 顶部状态卡：双人距离
@@ -174,6 +177,49 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
     }
+
+    // 长按地图后弹"命名"对话框
+    pendingLandmark?.let { (lat, lng) ->
+        var nameInput by remember { mutableStateOf("") }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { pendingLandmark = null },
+            containerColor = colors.surfaceCard,
+            title = { Text("在这里加个地标", style = ClaudeType.TitleLg, color = colors.ink) },
+            text = {
+                androidx.compose.foundation.layout.Column {
+                    Text("你们一起去过的地方？给它起个名字。",
+                        style = ClaudeType.BodySm, color = colors.body)
+                    Spacer(Modifier.height(ClaudeSpacing.sm))
+                    androidx.compose.material3.OutlinedTextField(
+                        value = nameInput,
+                        onValueChange = { nameInput = it.take(40) },
+                        placeholder = { Text("图书馆三楼 / 那家咖啡馆 …", color = colors.muted) },
+                        singleLine = true,
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = com.studybuddy.v2.theme.ClaudeColors.Primary,
+                            unfocusedBorderColor = colors.hairline
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        viewModel.createLandmark(nameInput, lat, lng)
+                        pendingLandmark = null
+                    },
+                    enabled = nameInput.trim().isNotEmpty()
+                ) {
+                    Text("加上", color = com.studybuddy.v2.theme.ClaudeColors.Primary)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { pendingLandmark = null }) {
+                    Text("取消", color = colors.muted)
+                }
+            }
+        )
+    }
 }
 
 private fun distanceLabel(meters: Double): String = when {
@@ -192,11 +238,14 @@ private fun AMapView(
     partnerLat: Double?,
     partnerLng: Double?,
     myLat: Double?,
-    myLng: Double?
+    myLng: Double?,
+    landmarks: List<com.studybuddy.v2.data.model.PairLandmark> = emptyList(),
+    onLongPress: (lat: Double, lng: Double) -> Unit = { _, _ -> }
 ) {
     val ctx = LocalContext.current
     val mapView = remember { TextureMapView(ctx) }
     var partnerMarker by remember { mutableStateOf<com.amap.api.maps.model.Marker?>(null) }
+    val landmarkMarkers = remember { mutableStateOf<List<com.amap.api.maps.model.Marker>>(emptyList()) }
 
     DisposableEffect(Unit) {
         mapView.onCreate(null)
@@ -218,6 +267,20 @@ private fun AMapView(
                 map.uiSettings.isZoomControlsEnabled = false
                 map.uiSettings.isScaleControlsEnabled = false
                 map.uiSettings.isCompassEnabled = false
+            }
+            // 长按地图触发"创建共享地标"
+            map.setOnMapLongClickListener { ll -> onLongPress(ll.latitude, ll.longitude) }
+
+            // 同步共享地标 markers（diff：先全部清掉再加）
+            landmarkMarkers.value.forEach { it.remove() }
+            landmarkMarkers.value = landmarks.map { lm ->
+                map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(lm.lat, lm.lng))
+                        .title(lm.name.ifBlank { "共享地标" })
+                        .snippet("到过 ${lm.visitCount} 次")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                )
             }
 
             // 搭档 marker（coral 色）

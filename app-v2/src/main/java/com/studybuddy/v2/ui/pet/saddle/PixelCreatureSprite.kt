@@ -47,8 +47,10 @@ fun PixelCreatureSprite(
     growthStage: GrowthStage,
     pose: Pose = Pose.IDLE,
     feedingTrigger: Long = 0L,
+    strokeTrigger: Long = 0L,    // 抚摸 → 头部小颤
+    cleanTrigger: Long = 0L,      // 清洁 → 抖动 + 闪亮
     sleeping: Boolean = false,
-    mood: Float = 50f,  // 新增：用于触发开心摇摆
+    mood: Float = 50f,
     pixelSize: Dp = 8.dp,
     color: Color? = null,
     modifier: Modifier = Modifier
@@ -144,6 +146,50 @@ fun PixelCreatureSprite(
         }
     }
 
+    // 5. 眨眼（每 4-8s 偶发；用 scaleY 短暂压扁模拟闭眼，整体微下沉）
+    val blinkScaleY = remember { Animatable(1f) }
+    LaunchedEffect(sleeping) {
+        if (sleeping) return@LaunchedEffect
+        while (true) {
+            delay(4000L + Random.nextLong(4000L))
+            blinkScaleY.animateTo(0.92f, tween(80))
+            blinkScaleY.animateTo(1f, tween(120))
+            // 偶尔双连眨
+            if (Random.nextInt(4) == 0) {
+                delay(140L)
+                blinkScaleY.animateTo(0.92f, tween(80))
+                blinkScaleY.animateTo(1f, tween(120))
+            }
+        }
+    }
+
+    // 6. 抚摸 → 头部小颤（rotationZ 短脉冲 ±3°，3 次）
+    val strokeRotation = remember { Animatable(0f) }
+    LaunchedEffect(strokeTrigger) {
+        if (strokeTrigger > 0L) {
+            repeat(3) {
+                strokeRotation.animateTo(-3f, tween(80))
+                strokeRotation.animateTo(3f, tween(120))
+            }
+            strokeRotation.animateTo(0f, tween(100))
+        }
+    }
+
+    // 7. 清洁 → 抖动（translationX 左右快速振荡 + alpha 轻闪）
+    val cleanShakeX = remember { Animatable(0f) }
+    val cleanAlpha = remember { Animatable(1f) }
+    LaunchedEffect(cleanTrigger) {
+        if (cleanTrigger > 0L) {
+            repeat(5) {
+                cleanShakeX.animateTo(-3f, tween(50))
+                cleanShakeX.animateTo(3f, tween(70))
+            }
+            cleanShakeX.animateTo(0f, tween(50))
+            cleanAlpha.animateTo(0.7f, tween(80))
+            cleanAlpha.animateTo(1f, tween(200))
+        }
+    }
+
     val totalW = pixelSize * SaddleFriendsFrames.COLS
     val totalH = pixelSize * SaddleFriendsFrames.ROWS
 
@@ -156,9 +202,11 @@ fun PixelCreatureSprite(
                 .graphicsLayer {
                     // 组合所有动画效果
                     scaleX = breathScale * hopSquashX.value * feedSquashX.value * happySquashX.value
-                    scaleY = breathScale * hopSquashY.value * feedSquashY.value
-                    rotationZ = tilt + happyRotation.value
+                    scaleY = breathScale * hopSquashY.value * feedSquashY.value * blinkScaleY.value
+                    rotationZ = tilt + happyRotation.value + strokeRotation.value
                     translationY = hopY.value
+                    translationX = cleanShakeX.value
+                    alpha = cleanAlpha.value
                 }
         ) {
             // 主色（底层）

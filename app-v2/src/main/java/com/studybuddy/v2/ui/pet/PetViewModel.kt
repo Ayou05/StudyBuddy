@@ -22,7 +22,9 @@ data class PetUiState(
     val pet: Pet? = null,
     val unlockedSaddleCat: Boolean = false,
     val currentEmote: String = "idle",
-    val feedingTrigger: Long = 0L
+    val feedingTrigger: Long = 0L,
+    val strokeTrigger: Long = 0L,
+    val cleanTrigger: Long = 0L
 )
 
 @HiltViewModel
@@ -62,10 +64,11 @@ class PetViewModel @Inject constructor(
         emoteAutoReset()
     }
     fun clean() = applyInteract { petRepo.interactClean(it) }.also {
+        _state.update { it.copy(cleanTrigger = System.currentTimeMillis()) }
         mascotState.touch()
     }
     fun stroke() = applyInteract { petRepo.interactStroke(it) }.also {
-        _state.update { it.copy(currentEmote = "happy") }
+        _state.update { it.copy(currentEmote = "happy", strokeTrigger = System.currentTimeMillis()) }
         mascotState.happy()
         emoteAutoReset()
     }

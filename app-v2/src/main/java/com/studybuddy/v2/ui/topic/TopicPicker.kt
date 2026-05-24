@@ -305,12 +305,14 @@ private fun EditTopicDialog(
 }
 
 private val PALETTE = listOf(
-    "#CC785C",  // coral（默认）
-    "#D4A04A",  // amber
+    "#CC785C",  // coral（默认，鞍部风主色）
+    "#D4A04A",  // amber（琥珀）
     "#5B8266",  // sage（沉静绿）
     "#4F5970",  // saddle ink（鞍部猫色）
     "#A37B73",  // 暮色棕
-    "#B0BAD0"   // 雾蓝灰
+    "#B0BAD0",  // 雾蓝灰
+    "#8B7B9E",  // 薰衣草灰
+    "#9A8B7A"   // 赭石灰
 )
 
 @Composable

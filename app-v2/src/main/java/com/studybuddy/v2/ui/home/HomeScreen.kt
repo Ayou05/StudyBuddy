@@ -69,7 +69,6 @@ fun HomeScreen(
     onOpenFund: () -> Unit = {},
     onOpenStats: () -> Unit = {},
     onOpenHistory: () -> Unit = {},
-    onOpenSettings: () -> Unit = {},
     onOpenNoteWall: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -147,27 +146,8 @@ fun HomeScreen(
                 .padding(horizontal = ClaudeSpacing.pageHorizontal)
                 .padding(top = ClaudeSpacing.xxl, bottom = ClaudeSpacing.xxl)
         ) {
-            // 顶栏：右上角小齿轮 → Settings 全屏（Me 已合并到 Settings）
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = androidx.compose.ui.Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Greeting(nickname = state.nickname)
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(androidx.compose.foundation.shape.CircleShape)
-                        .clickable { onOpenSettings() },
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    com.studybuddy.v2.ui.component.AppIcon(
-                        name = "settings",
-                        size = 22.dp,
-                        tint = MaterialTheme.appColors.muted
-                    )
-                }
-            }
+            // 顶栏：问候语（Settings 已移到 BottomBar 最右侧）
+            Greeting(nickname = state.nickname)
             // 姿态视觉锚 —— 12sp 灰字，用户隐约感知"app 在跟随我"
             if (state.poseCaption.isNotBlank()) {
                 Spacer(Modifier.height(ClaudeSpacing.xs))
@@ -217,8 +197,7 @@ fun HomeScreen(
             ConnectorGrid(
                 onFund = onOpenFund,
                 onStats = onOpenStats,
-                onHistory = onOpenHistory,
-                onSettings = onOpenSettings
+                onHistory = onOpenHistory
             )
             Spacer(Modifier.height(ClaudeSpacing.xl))
         }
@@ -412,8 +391,7 @@ private fun LiveDot(color: Color) {
 private fun ConnectorGrid(
     onFund: () -> Unit,
     onStats: () -> Unit,
-    onHistory: () -> Unit,
-    onSettings: () -> Unit
+    onHistory: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(ClaudeSpacing.sm)) {
         Row(horizontalArrangement = Arrangement.spacedBy(ClaudeSpacing.sm)) {
@@ -422,7 +400,8 @@ private fun ConnectorGrid(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(ClaudeSpacing.sm)) {
             ConnectorTile("history", "专注历史", "回顾记录", onHistory, Modifier.weight(1f))
-            ConnectorTile("settings", "设置", "偏好配置", onSettings, Modifier.weight(1f))
+            // Settings 已移到 BottomBar，这里留空或改成其他入口（便签墙）
+            Spacer(Modifier.weight(1f))
         }
     }
 }

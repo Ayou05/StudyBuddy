@@ -14,8 +14,8 @@ android {
         applicationId = "com.studybuddy.v2"
         minSdk = 26
         targetSdk = 34
-        versionCode = 26
-        versionName = "2.6.0-beta"
+        versionCode = 29
+        versionName = "2.7.1-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }

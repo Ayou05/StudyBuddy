@@ -93,6 +93,8 @@ fun PetScreen(
                 pet = state.pet!!,
                 currentEmote = state.currentEmote,
                 feedingTrigger = state.feedingTrigger,
+                strokeTrigger = state.strokeTrigger,
+                cleanTrigger = state.cleanTrigger,
                 onFeed = viewModel::feed,
                 onPlay = viewModel::play,
                 onClean = viewModel::clean,
@@ -154,6 +156,8 @@ private fun PetContent(
     pet: Pet,
     currentEmote: String,
     feedingTrigger: Long,
+    strokeTrigger: Long,
+    cleanTrigger: Long,
     onFeed: () -> Unit,
     onPlay: () -> Unit,
     onClean: () -> Unit,
@@ -278,8 +282,10 @@ private fun PetContent(
                                    else if (currentEmote == "happy") com.studybuddy.v2.ui.pet.saddle.Pose.HAPPY
                                    else com.studybuddy.v2.ui.pet.saddle.Pose.IDLE,
                             feedingTrigger = feedingTrigger,
+                            strokeTrigger = strokeTrigger,
+                            cleanTrigger = cleanTrigger,
                             sleeping = currentEmote == "sleeping",
-                            mood = pet.mood,  // 传入 mood 用于触发开心摇摆
+                            mood = pet.mood,
                             pixelSize = 12.dp
                         )
                     }

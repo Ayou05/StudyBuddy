@@ -123,4 +123,14 @@ class MapViewModel @Inject constructor(
         val d = PoseCalculator.distanceMeters(s.myLat, s.myLng, s.partnerLat, s.partnerLng)
         _state.update { it.copy(distanceM = d) }
     }
+
+    fun createLandmark(name: String, lat: Double, lng: Double) {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            val created = landmarkRepo.create(name = name.trim().take(40), lat = lat, lng = lng)
+            if (created != null) {
+                _state.update { it.copy(landmarks = it.landmarks + created) }
+            }
+        }
+    }
 }

@@ -99,8 +99,21 @@ fun MascotDock(
     val roamer = remember { MascotRoamer(scope) }
     val avoidRegistry = remember { MascotAvoidRegistry() }
     var canvasBounds by remember { mutableStateOf<Rect?>(null) }
-    val pose by roamer.pose.collectAsState()
+    val roamerPose by roamer.pose.collectAsState()
     val mode by roamer.mode.collectAsState()
+    val mascotState = remember {
+        EntryPointAccessors.fromApplication(
+            ctx.applicationContext,
+            MascotDockEntryPoint::class.java
+        ).mascotState()
+    }
+    // emotion 优先级高于 roamer.pose（feed/play/stroke 触发的 happy 跨页生效）
+    val pose = when (mascotState.emotion) {
+        "happy" -> com.studybuddy.v2.ui.pet.saddle.Pose.HAPPY
+        "sleeping" -> com.studybuddy.v2.ui.pet.saddle.Pose.SLEEPING
+        "spooked" -> com.studybuddy.v2.ui.pet.saddle.Pose.STARTLED
+        else -> roamerPose
+    }
 
     // popover 状态：dock 单击鞍部猫触发，2s 后自动隐藏
     var popoverAt by remember { mutableStateOf<Offset?>(null) }
@@ -452,4 +465,5 @@ private fun InteriorMascot(
 interface MascotDockEntryPoint {
     fun preferencesStore(): PreferencesStore
     fun mascotPersistentState(): MascotPersistentState
+    fun mascotState(): com.studybuddy.v2.ui.mascot.MascotState
 }
