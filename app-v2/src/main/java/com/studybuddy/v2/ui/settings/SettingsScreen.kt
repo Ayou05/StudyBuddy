@@ -195,6 +195,41 @@ fun SettingsScreen(
         // ─── 关于 ────────────────────────────────────────────
         Spacer(Modifier.height(ClaudeSpacing.xl))
         SectionTitle("ABOUT")
+
+        // 检查更新行
+        val updateVm: com.studybuddy.v2.ui.update.UpdateViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+        val updateState by updateVm.state.collectAsState()
+        AppCard.Feature(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = !updateState.checking) { updateVm.checkUpdate(manual = true) },
+            padding = ClaudeSpacing.lg
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("检查更新", style = ClaudeType.BodySm, color = colors.body)
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        when {
+                            updateState.checking -> "检查中…"
+                            updateState.noUpdate -> "已是最新版本"
+                            updateState.latest != null -> "有新版 ${updateState.latest!!.versionName}"
+                            else -> "当前 ${updateState.currentVersionName}"
+                        },
+                        style = ClaudeType.Caption,
+                        color = if (updateState.latest != null) ClaudeColors.Primary else colors.muted
+                    )
+                }
+                Text("›", style = ClaudeType.TitleLg, color = colors.muted)
+            }
+        }
+        // 更新对话框（仅在有 latest 时显示，shared with global one）
+        com.studybuddy.v2.ui.update.UpdateDialog(viewModel = updateVm)
+
+        Spacer(Modifier.height(ClaudeSpacing.sm))
         AppCard.Feature(
             modifier = Modifier
                 .fillMaxWidth()

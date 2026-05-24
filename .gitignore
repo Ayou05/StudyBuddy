@@ -22,6 +22,8 @@ Thumbs.db
 google-services.json
 *.keystore
 *.jks
+tools/admin/config.json
+tools/admin/*.token
 
 # Big media archives in repo root
 Kimi_Agent_猫咪插画/

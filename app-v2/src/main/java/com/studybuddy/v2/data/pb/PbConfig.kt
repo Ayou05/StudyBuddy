@@ -25,4 +25,5 @@ object PbConfig {
     const val MEETINGS = "meetings" // P5 见面记录（异地党核心）
     const val PAIR_LANDMARKS = "pair_landmarks"  // P5 共享地标（你们一起去过的地方）
     const val FOCUS_TOPICS = "focus_topics"      // P5 多主题专注（鞍部风铭牌）
+    const val APP_VERSIONS = "app_versions"      // 自更新：发布 channel
 }

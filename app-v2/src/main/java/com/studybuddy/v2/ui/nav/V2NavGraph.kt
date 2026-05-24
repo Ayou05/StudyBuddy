@@ -109,6 +109,13 @@ private fun MainScaffold(navController: NavHostController) {
         Screen.Map.route
     )
 
+    // 启动时自动检查更新（一次，静默；有新版才弹）
+    val updateVm: com.studybuddy.v2.ui.update.UpdateViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(2000)  // 给 SSE/启动让路
+        updateVm.checkUpdate(manual = false)
+    }
+
     ScaffoldBody(
         navController = navController,
         colors = colors,
@@ -116,6 +123,8 @@ private fun MainScaffold(navController: NavHostController) {
         currentRoute = currentRoute,
         showMascot = showMascot
     )
+
+    com.studybuddy.v2.ui.update.UpdateDialog(viewModel = updateVm)
 }
 
 @Composable

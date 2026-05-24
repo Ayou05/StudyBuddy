@@ -8,12 +8,13 @@
 ## 🔴 P0 / 强烈建议下一轮做（核心陪伴感）
 
 ### 鞍部猫跨页持久化 L5
-- 单例 `MascotState`（位置/姿态/表情）
-- 跨 Home / Focus / Pet / Letter / Map 持久
-- Focus 页"陪伴位"：在时钟边缘趴着
-- Pet 页"窝"：占据角落，偶尔走过
-- 跨页过渡：tab 切换时它从一边走到另一边
-- 工程量：1-2 天
+- ✅ 单例 `MascotState`（emotion / spookedCount / lastInteractAt）
+- ✅ PetViewModel 互动会同步更新 MascotState（feed/play/stroke → happy）
+- 待做：MascotDock 真正读 MascotState 渲染（当前还是 dock 内部 state）
+- 待做：Focus 页"陪伴位"真正读 MascotState
+- 待做：Pet 页"窝"占据角落
+- 待做：跨页过渡动画
+- 工程量：剩余 1 天
 
 ### Q 弹动画补完 - 眨眼
 - 局部矩阵改变眼睛 row 2-3，每 30-60s 触发
@@ -154,3 +155,20 @@
 ---
 
 最后更新：2026-05-24
+
+---
+
+## 发布流程（v2.6.0+ 新增热更新）
+
+PB 端有 `app_versions` collection；App 启动 2s 后自动检查 channel="beta" 最新一条；versionCode 大于本机就弹 `UpdateDialog` 提示下载安装。
+
+发布新版步骤（脚本：`publish-update.sh`）：
+1. 改 `app-v2/build.gradle.kts` 的 versionCode +1、versionName 改新版
+2. `./gradlew :app-v2:assembleDebug`
+3. 用 `gh release create vX.Y.Z app-v2-debug.apk -t "vX.Y.Z" -n "更新说明"` 上传 GitHub Releases（或自建 CDN）
+4. `./publish-update.sh <code> <name> "<notes>" beta`
+   脚本登录 PB superuser → 新建一条 app_versions 记录 → 客户端就能拉到了
+
+强制升级：把 `force=true` 写进记录，UI 不显示"稍后"按钮。
+渠道：默认拉 `beta`，可在代码中改成 `stable` 给正式用户。
+回滚：删除新版记录或改 channel，客户端下次启动检查到没新版就不弹。

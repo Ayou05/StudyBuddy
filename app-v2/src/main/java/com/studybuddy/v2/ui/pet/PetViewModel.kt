@@ -29,7 +29,8 @@ data class PetUiState(
 class PetViewModel @Inject constructor(
     private val userRepo: UserRepo,
     private val petRepo: PetRepo,
-    private val prefs: PreferencesStore
+    private val prefs: PreferencesStore,
+    private val mascotState: com.studybuddy.v2.ui.mascot.MascotState
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PetUiState())
@@ -52,14 +53,21 @@ class PetViewModel @Inject constructor(
 
     fun feed() = applyInteract { petRepo.interactFeed(it) }.also {
         _state.update { it.copy(currentEmote = "happy", feedingTrigger = System.currentTimeMillis()) }
+        mascotState.happy()
         emoteAutoReset()
     }
     fun play() = applyInteract { petRepo.interactPlay(it) }.also {
-        _state.update { it.copy(currentEmote = "happy") }; emoteAutoReset()
+        _state.update { it.copy(currentEmote = "happy") }
+        mascotState.happy()
+        emoteAutoReset()
     }
-    fun clean() = applyInteract { petRepo.interactClean(it) }
+    fun clean() = applyInteract { petRepo.interactClean(it) }.also {
+        mascotState.touch()
+    }
     fun stroke() = applyInteract { petRepo.interactStroke(it) }.also {
-        _state.update { it.copy(currentEmote = "happy") }; emoteAutoReset()
+        _state.update { it.copy(currentEmote = "happy") }
+        mascotState.happy()
+        emoteAutoReset()
     }
 
     fun setBreed(target: PetBreed) {
@@ -83,6 +91,7 @@ class PetViewModel @Inject constructor(
         viewModelScope.launch {
             kotlinx.coroutines.delay(2_500)
             _state.update { it.copy(currentEmote = "idle") }
+            mascotState.setIdle()
         }
     }
 
